@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#FAF5F0">
+<meta name="color-scheme" content="light">
+<style>:root{color-scheme:light}</style>
+<title>Diagnóstico Rápido — Ester Carvalho Consultoria</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --ink:#1a1a1a;
+  --paper:#FAF5F0;
+  --stone:#e2ded8;
+  --mist:#c4c0ba;
+  --ghost:#8a8580;
+  --accent:#3a3a3a;
+  --accent-soft:#ececec;
+  --green:#3a3a3a;
+  --green-soft:#ececec;
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:'Inter',sans-serif;
+}
+
+html{scroll-behavior:smooth;background:#FAF5F0}
+body{
+  background:var(--paper);color:var(--ink);font-family:var(--sans);
+  font-weight:300;line-height:1.7;min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  padding:2rem 1.2rem;
+}
+
+.app{width:100%;max-width:600px}
+
+/* ── SHARED ── */
+.eyebrow{font-size:.62rem;letter-spacing:.32em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;text-align:center}
+.logo-mark{display:flex;justify-content:center;margin-bottom:1.4rem}
+.logo-mark svg{width:52px;height:52px}
+
+/* ── SCREEN SYSTEM ── */
+.screen{display:none}
+.screen.active{display:block;animation:fadeIn .5s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── INTRO ── */
+#intro{text-align:center}
+.intro-title{
+  font-family:var(--serif);font-weight:300;
+  font-size:clamp(2rem,7vw,2.8rem);line-height:1.12;
+  margin-bottom:1.2rem;letter-spacing:.01em;
+}
+.intro-title em{font-style:italic;color:var(--accent)}
+.intro-sub{font-size:.85rem;color:#666;max-width:440px;margin:0 auto 2.2rem;line-height:1.85}
+
+.intro-meta{
+  display:flex;justify-content:center;gap:2rem;margin-bottom:2.5rem;flex-wrap:wrap;
+}
+.intro-meta-item{display:flex;align-items:center;gap:.5rem;font-size:.68rem;color:var(--ghost);letter-spacing:.04em}
+.intro-meta-item svg{width:14px;height:14px;stroke:var(--accent);flex-shrink:0}
+
+.btn-primary{
+  display:inline-flex;align-items:center;gap:.8rem;
+  background:var(--ink);color:var(--paper);
+  padding:1.05rem 2.6rem;border:none;cursor:pointer;
+  font-size:.66rem;letter-spacing:.2em;text-transform:uppercase;
+  font-family:var(--sans);font-weight:500;
+  transition:background .25s;
+}
+.btn-primary:hover{background:#333}
+.btn-primary svg{width:14px;height:14px}
+
+/* ── QUIZ SCREEN ── */
+#quiz-screen{}
+
+.progress-wrap{margin-bottom:2.2rem}
+.progress-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.6rem}
+.progress-label{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ghost)}
+.progress-count{font-family:var(--serif);font-size:.95rem;color:var(--accent)}
+.progress-track{height:2px;background:var(--stone);width:100%;position:relative}
+.progress-fill{height:2px;background:var(--accent);width:12.5%;transition:width .4s cubic-bezier(.4,0,.2,1)}
+
+.q-category{
+  font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--accent);margin-bottom:.8rem;
+}
+.q-title{
+  font-family:var(--serif);font-weight:400;
+  font-size:clamp(1.5rem,5vw,2rem);line-height:1.25;
+  margin-bottom:2rem;
+}
+
+.options{display:flex;flex-direction:column;gap:.7rem;margin-bottom:2rem}
+.option{
+  display:flex;align-items:center;gap:1rem;
+  background:#fff;border:1px solid var(--stone);
+  padding:1.1rem 1.3rem;cursor:pointer;
+  transition:border-color .2s,background .2s;
+  text-align:left;font-family:var(--sans);
+}
+.option:hover{border-color:var(--accent);background:var(--accent-soft)}
+.option.selected{border-color:var(--accent);background:var(--accent-soft)}
+.option-bullet{
+  width:18px;height:18px;border-radius:50%;border:1.5px solid var(--mist);
+  flex-shrink:0;position:relative;transition:border-color .2s;
+}
+.option.selected .option-bullet{border-color:var(--accent)}
+.option.selected .option-bullet::after{
+  content:'';position:absolute;inset:3px;border-radius:50%;background:var(--accent);
+}
+.option-text{font-size:.84rem;color:#333;line-height:1.5}
+
+.nav-row{display:flex;justify-content:space-between;align-items:center}
+.btn-back{
+  background:none;border:none;cursor:pointer;
+  font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--ghost);font-family:var(--sans);
+  display:flex;align-items:center;gap:.5rem;
+  transition:color .2s;
+}
+.btn-back:hover{color:var(--ink)}
+.btn-back svg{width:12px;height:12px}
+.btn-back.hidden{visibility:hidden}
+
+/* ── LOADING ── */
+#loading-screen{text-align:center;padding:3rem 0}
+.loading-title{font-family:var(--serif);font-size:1.5rem;margin-bottom:2rem}
+.loading-bar-track{height:2px;background:var(--stone);max-width:240px;margin:0 auto;overflow:hidden}
+.loading-bar-fill{height:2px;background:var(--accent);width:0%;animation:loadProgress 1.8s ease forwards}
+@keyframes loadProgress{to{width:100%}}
+.loading-sub{font-size:.7rem;color:var(--ghost);margin-top:1.2rem;letter-spacing:.05em}
+
+/* ── RESULT SCREEN ── */
+#result-screen{}
+.result-badge{
+  display:inline-block;margin:0 auto 1.5rem;display:block;width:fit-content;
+  background:var(--accent-soft);color:var(--accent);
+  font-size:.6rem;letter-spacing:.18em;text-transform:uppercase;
+  padding:.5rem 1.2rem;font-weight:500;
+}
+.result-title{
+  font-family:var(--serif);font-weight:300;text-align:center;
+  font-size:clamp(2rem,7vw,2.8rem);line-height:1.15;margin-bottom:1.2rem;
+}
+.result-title em{font-style:italic;color:var(--accent)}
+.result-desc{font-size:.85rem;color:#555;text-align:center;max-width:460px;margin:0 auto 2.2rem;line-height:1.85}
+
+.score-bars{margin-bottom:2.4rem}
+.score-bar-row{margin-bottom:1.3rem}
+.score-bar-label{
+  display:flex;justify-content:space-between;font-size:.66rem;
+  letter-spacing:.08em;text-transform:uppercase;color:#555;margin-bottom:.5rem;
+}
+.score-bar-label .score-val{font-family:var(--serif);font-size:.85rem;color:var(--accent);letter-spacing:0;text-transform:none}
+.score-bar-track{height:6px;background:var(--stone);width:100%;position:relative}
+.score-bar-fill{height:6px;background:var(--accent);width:0%;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.score-bar-fill.weak{background:var(--ink)}
+
+.priority-box{
+  background:#fff;border:1px solid var(--stone);padding:1.8rem 1.6rem;margin-bottom:2.2rem;
+}
+.priority-label{font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:.7rem}
+.priority-text{font-size:.82rem;color:#444;line-height:1.8}
+.priority-text strong{color:var(--ink);font-weight:500}
+
+.result-ctas{display:flex;flex-direction:column;gap:.8rem}
+.btn-cta-primary{
+  display:flex;align-items:center;justify-content:center;gap:.8rem;
+  background:var(--ink);color:var(--paper);
+  padding:1.1rem;border:none;cursor:pointer;text-decoration:none;
+  font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;
+  font-family:var(--sans);font-weight:500;transition:background .25s;
+}
+.btn-cta-primary:hover{background:#333}
+.btn-cta-primary svg{width:14px;height:14px}
+
+.btn-cta-secondary{
+  display:flex;align-items:center;justify-content:center;gap:.8rem;
+  border:1px solid var(--mist);color:var(--ink);
+  padding:1.1rem;cursor:pointer;text-decoration:none;background:none;
+  font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;
+  font-family:var(--sans);font-weight:500;transition:border-color .25s,background .25s;
+}
+.btn-cta-secondary:hover{border-color:var(--ink);background:#fff}
+
+.restart-link{
+  display:block;text-align:center;margin-top:1.8rem;
+  font-size:.62rem;letter-spacing:.1em;color:var(--ghost);
+  text-decoration:underline;text-decoration-color:var(--mist);
+  background:none;border:none;cursor:pointer;font-family:var(--sans);
+}
+.restart-link:hover{color:var(--ink)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:480px){
+  body{padding:1.5rem 1rem}
+  .option{padding:.9rem 1.1rem}
+  .intro-meta{gap:1.2rem}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <div class="logo-mark">
+    <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="40" cy="40" r="38" stroke="#1a1a1a" stroke-width="1.3"/>
+      <path d="M16 41h9l5-14 8 28 6-20 4 6h16" fill="none" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <p class="eyebrow">Ester Carvalho Consultoria</p>
+
+  <!-- ══════ INTRO ══════ -->
+  <div class="screen active" id="intro">
+    <h1 class="intro-title">Onde o seu negócio<br>está <em>perdendo força</em>?</h1>
+    <p class="intro-sub">8 perguntas rápidas pra descobrir se o ponto fraco do seu negócio está no atendimento, na presença digital ou na organização do dia a dia — com um diagnóstico personalizado no final.</p>
+
+    <div class="intro-meta">
+      <div class="intro-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        2 minutos
+      </div>
+      <div class="intro-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+        8 perguntas
+      </div>
+      <div class="intro-meta-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-6M6 20V10M18 20V4"/></svg>
+        Resultado na hora
+      </div>
+    </div>
+
+    <div style="text-align:center">
+      <button class="btn-primary" onclick="startQuiz()">
+        Começar diagnóstico
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════ QUIZ ══════ -->
+  <div class="screen" id="quiz-screen">
+    <div class="progress-wrap">
+      <div class="progress-row">
+        <span class="progress-label" id="q-category-top">Atendimento</span>
+        <span class="progress-count"><span id="q-current">1</span> / 8</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    </div>
+
+    <h2 class="q-title" id="q-title"></h2>
+    <div class="options" id="q-options"></div>
+
+    <div class="nav-row">
+      <button class="btn-back" id="btn-back" onclick="goBack()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Voltar
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════ LOADING ══════ -->
+  <div class="screen" id="loading-screen">
+    <p class="loading-title">Calculando seu diagnóstico...</p>
+    <div class="loading-bar-track"><div class="loading-bar-fill"></div></div>
+    <p class="loading-sub">Analisando suas respostas</p>
+  </div>
+
+  <!-- ══════ RESULT ══════ -->
+  <div class="screen" id="result-screen">
+    <span class="result-badge" id="result-badge"></span>
+    <h2 class="result-title" id="result-title"></h2>
+    <p class="result-desc" id="result-desc"></p>
+
+    <div class="score-bars" id="score-bars"></div>
+
+    <div class="priority-box">
+      <p class="priority-label">Seu maior ponto de atenção agora</p>
+      <p class="priority-text" id="priority-text"></p>
+    </div>
+
+    <div class="result-ctas">
+      <a class="btn-cta-primary" id="cta-pacotes" href="#" target="_blank">
+        Ver pacote recomendado
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a class="btn-cta-secondary" id="cta-whatsapp" href="#" target="_blank">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Conversar no WhatsApp
+      </a>
+    </div>
+
+    <button class="restart-link" onclick="restartQuiz()">Refazer o diagnóstico</button>
+  </div>
+
+</div>
+
+<script>
+/* ════════ DATA ════════ */
+// category: 'atendimento' | 'digital' | 'organizacao'
+// each option has a score 0-3 (3 = best practice, 0 = worst)
+const QUESTIONS = [
+  {
+    category: 'atendimento',
+    label: 'Atendimento',
+    title: 'Quando um cliente manda mensagem fora do horário comercial, o que costuma acontecer?',
+    options: [
+      { text: 'Só respondo quando vejo, às vezes dias depois', score: 0 },
+      { text: 'Tento responder rápido, mas dependo de estar com o celular em mãos', score: 1 },
+      { text: 'Tenho uma mensagem automática avisando que vou responder em breve', score: 2 },
+      { text: 'Tenho automação que já inicia o atendimento sozinha', score: 3 },
+    ]
+  },
+  {
+    category: 'atendimento',
+    label: 'Atendimento',
+    title: 'Como você organiza as conversas e pedidos que chegam pelo WhatsApp?',
+    options: [
+      { text: 'Não organizo, fica tudo misturado no chat', score: 0 },
+      { text: 'Uso favoritos ou anotações soltas no celular', score: 1 },
+      { text: 'Tenho uma planilha que atualizo manualmente', score: 2 },
+      { text: 'Uso um sistema que organiza isso automaticamente', score: 3 },
+    ]
+  },
+  {
+    category: 'atendimento',
+    label: 'Atendimento',
+    title: 'Se você ficasse 3 dias sem acesso ao celular, o atendimento do seu negócio...',
+    options: [
+      { text: 'Pararia completamente', score: 0 },
+      { text: 'Ficaria bem prejudicado', score: 1 },
+      { text: 'Continuaria parcialmente, com alguns atrasos', score: 2 },
+      { text: 'Continuaria funcionando quase normal', score: 3 },
+    ]
+  },
+  {
+    category: 'digital',
+    label: 'Presença digital',
+    title: 'Hoje, alguém que te encontra pela primeira vez no Instagram consegue saber exatamente o que você vende e como comprar?',
+    options: [
+      { text: 'Não, meu perfil não deixa isso claro', score: 0 },
+      { text: 'Mais ou menos, precisa perguntar pra entender', score: 1 },
+      { text: 'Sim, mas falta um link ou site pra fechar', score: 2 },
+      { text: 'Sim, tenho site ou link que já direciona pra venda', score: 3 },
+    ]
+  },
+  {
+    category: 'digital',
+    label: 'Presença digital',
+    title: 'Você tem um site ou página própria (fora das redes sociais)?',
+    options: [
+      { text: 'Não tenho nenhum site', score: 0 },
+      { text: 'Tenho, mas está desatualizado ou nunca terminei', score: 1 },
+      { text: 'Tenho um site simples, funcional', score: 2 },
+      { text: 'Tenho um site profissional que gera resultado', score: 3 },
+    ]
+  },
+  {
+    category: 'digital',
+    label: 'Presença digital',
+    title: 'Como alguém pode agendar, comprar ou falar com você pelo seu perfil?',
+    options: [
+      { text: 'Só mandando mensagem direta e esperando resposta', score: 0 },
+      { text: 'Tenho um link na bio, mas é genérico (Linktree, etc)', score: 1 },
+      { text: 'Tenho um WhatsApp Business com catálogo', score: 2 },
+      { text: 'Tenho site ou sistema próprio com botão de ação clara', score: 3 },
+    ]
+  },
+  {
+    category: 'organizacao',
+    label: 'Organização',
+    title: 'Como está organizado o financeiro do seu negócio hoje?',
+    options: [
+      { text: 'Não separo o dinheiro do negócio do pessoal', score: 0 },
+      { text: 'Tenho uma ideia geral, mas não acompanho de perto', score: 1 },
+      { text: 'Uso planilha ou app, mas demora pra atualizar', score: 2 },
+      { text: 'Tenho controle claro e atualizado do financeiro', score: 3 },
+    ]
+  },
+  {
+    category: 'organizacao',
+    label: 'Organização',
+    title: 'Se alguém te perguntasse sua meta para este mês, você responderia...',
+    options: [
+      { text: 'Não tenho metas definidas', score: 0 },
+      { text: 'Tenho uma ideia vaga na cabeça', score: 1 },
+      { text: 'Tenho uma meta, mas não acompanho o progresso', score: 2 },
+      { text: 'Tenho metas claras e acompanho regularmente', score: 3 },
+    ]
+  },
+];
+
+const TOTAL_QUESTIONS = QUESTIONS.length;
+const MAX_SCORE_PER_Q = 3;
+
+/* ════════ STATE ════════ */
+let currentQ = 0;
+let answers = new Array(TOTAL_QUESTIONS).fill(null);
+
+/* ════════ SCREEN NAV ════════ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startQuiz() {
+  currentQ = 0;
+  answers = new Array(TOTAL_QUESTIONS).fill(null);
+  showScreen('quiz-screen');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[currentQ];
+  document.getElementById('q-category-top').textContent = q.label;
+  document.getElementById('q-current').textContent = currentQ + 1;
+  document.getElementById('progress-fill').style.width = (((currentQ + 1) / TOTAL_QUESTIONS) * 100) + '%';
+  document.getElementById('q-title').textContent = q.title;
+
+  const optionsWrap = document.getElementById('q-options');
+  optionsWrap.innerHTML = '';
+  q.options.forEach((opt, idx) => {
+    const div = document.createElement('button');
+    div.className = 'option' + (answers[currentQ] === idx ? ' selected' : '');
+    div.innerHTML = `<span class="option-bullet"></span><span class="option-text">${opt.text}</span>`;
+    div.onclick = () => selectOption(idx);
+    optionsWrap.appendChild(div);
+  });
+
+  document.getElementById('btn-back').classList.toggle('hidden', currentQ === 0);
+}
+
+function selectOption(idx) {
+  answers[currentQ] = idx;
+  setTimeout(() => {
+    if (currentQ < TOTAL_QUESTIONS - 1) {
+      currentQ++;
+      renderQuestion();
+    } else {
+      finishQuiz();
+    }
+  }, 280);
+  renderQuestion();
+}
+
+function goBack() {
+  if (currentQ > 0) {
+    currentQ--;
+    renderQuestion();
+  }
+}
+
+function finishQuiz() {
+  showScreen('loading-screen');
+  setTimeout(() => {
+    computeAndShowResult();
+  }, 1900);
+}
+
+/* ════════ SCORING ════════ */
+function computeAndShowResult() {
+  const categoryScores = { atendimento: 0, digital: 0, organizacao: 0 };
+  const categoryMax = { atendimento: 0, digital: 0, organizacao: 0 };
+
+  QUESTIONS.forEach((q, i) => {
+    const ansIdx = answers[i];
+    const score = q.options[ansIdx].score;
+    categoryScores[q.category] += score;
+    categoryMax[q.category] += MAX_SCORE_PER_Q;
+  });
+
+  const totalScore = categoryScores.atendimento + categoryScores.digital + categoryScores.organizacao;
+  const totalMax = categoryMax.atendimento + categoryMax.digital + categoryMax.organizacao;
+  const pct = totalScore / totalMax;
+
+  // find weakest category (lowest % within its own max)
+  const catPercents = {
+    atendimento: categoryScores.atendimento / categoryMax.atendimento,
+    digital: categoryScores.digital / categoryMax.digital,
+    organizacao: categoryScores.organizacao / categoryMax.organizacao,
+  };
+  const weakestCat = Object.keys(catPercents).reduce((a, b) => catPercents[a] <= catPercents[b] ? a : b);
+
+  renderResult(totalScore, totalMax, pct, categoryScores, categoryMax, weakestCat);
+  showScreen('result-screen');
+}
+
+const CATEGORY_LABELS = {
+  atendimento: 'Atendimento',
+  digital: 'Presença digital',
+  organizacao: 'Organização interna',
+};
+
+const CATEGORY_PRIORITY_TEXT = {
+  atendimento: 'Hoje, boa parte do seu atendimento depende de você estar disponível o tempo todo. Isso cansa e faz você perder clientes que escrevem fora do horário. Uma automação simples no WhatsApp resolve isso rápido — é exatamente o que entra no plano <strong>Premium</strong> de sites personalizados.',
+  digital: 'Quem chega até você pelas redes ainda não encontra um caminho claro pra comprar ou agendar. Isso significa visitas e curiosos que se perdem antes de virar cliente. Um site bem estruturado, com um caminho de ação claro, resolve esse gargalo — veja o plano <strong>Completo</strong>.',
+  organizacao: 'Falta uma visão clara de números e metas no seu negócio — o que torna difícil saber se você está crescendo de verdade ou só correndo bastante. Organizar isso com metas e indicadores simples já muda o jogo — é onde entra a <strong>Gestão Estratégica</strong>.',
+};
+
+const RESULT_TIERS = [
+  {
+    max: 0.34,
+    badge: 'Diagnóstico: atenção',
+    title: 'Sua operação está no <em>improviso</em>.',
+    desc: 'Seu negócio está rodando na base do esforço pessoal — o que funciona até certo ponto, mas custa caro em tempo e energia. A boa notícia: dá pra resolver isso com passos simples e objetivos.',
+  },
+  {
+    max: 0.59,
+    badge: 'Diagnóstico: em construção',
+    title: 'A base existe, mas <em>falta sistema</em>.',
+    desc: 'Você já tem o básico funcionando, mas ainda depende muito de fazer tudo manualmente. Com um pouco de estrutura a mais, esse esforço todo rende muito mais resultado.',
+  },
+  {
+    max: 0.84,
+    badge: 'Diagnóstico: quase lá',
+    title: 'Você está <em>perto</em> do ponto ideal.',
+    desc: 'Seu negócio já tem boas bases. Falta afinar alguns pontos específicos pra destravar o próximo nível de crescimento — geralmente é menos trabalho do que parece.',
+  },
+  {
+    max: 1,
+    badge: 'Diagnóstico: operação sólida',
+    title: 'Sua gestão está <em>redonda</em>.',
+    desc: 'Você está à frente da maioria dos negócios nesse estágio. Mesmo assim, sempre existe um ponto pra refinar — vamos ver onde dá pra ganhar ainda mais eficiência.',
+  },
+];
+
+function renderResult(totalScore, totalMax, pct, categoryScores, categoryMax, weakestCat) {
+  const tier = RESULT_TIERS.find(t => pct <= t.max);
+
+  document.getElementById('result-badge').textContent = tier.badge;
+  document.getElementById('result-title').innerHTML = tier.title;
+  document.getElementById('result-desc').textContent = tier.desc;
+
+  // score bars
+  const barsWrap = document.getElementById('score-bars');
+  barsWrap.innerHTML = '';
+  ['atendimento', 'digital', 'organizacao'].forEach(cat => {
+    const catPct = Math.round((categoryScores[cat] / categoryMax[cat]) * 100);
+    const isWeak = cat === weakestCat;
+    const row = document.createElement('div');
+    row.className = 'score-bar-row';
+    row.innerHTML = `
+      <div class="score-bar-label">
+        <span>${CATEGORY_LABELS[cat]}</span>
+        <span class="score-val">${catPct}%</span>
+      </div>
+      <div class="score-bar-track">
+        <div class="score-bar-fill ${isWeak ? 'weak' : ''}" style="width:0%" data-target="${catPct}"></div>
+      </div>
+    `;
+    barsWrap.appendChild(row);
+  });
+
+  // animate bars after render
+  setTimeout(() => {
+    document.querySelectorAll('.score-bar-fill').forEach(el => {
+      el.style.width = el.dataset.target + '%';
+    });
+  }, 100);
+
+  document.getElementById('priority-text').innerHTML = CATEGORY_PRIORITY_TEXT[weakestCat];
+
+  // CTAs
+  const pacotesUrl = 'https://pacotesec.onrender.com';
+  const waMsg = encodeURIComponent(`Olá! Acabei de fazer o diagnóstico no site e meu resultado apontou ${CATEGORY_LABELS[weakestCat]} como meu ponto de atenção. Quero entender melhor como resolver isso!`);
+  document.getElementById('cta-pacotes').href = pacotesUrl;
+  document.getElementById('cta-whatsapp').href = `https://wa.me/5587991737358?text=${waMsg}`;
+}
+
+function restartQuiz() {
+  startQuiz();
+}
+</script>
+</body>
+</html>
